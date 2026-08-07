@@ -1,8 +1,11 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import type { CreateTaskInput } from '@/lib/validation/task';
+import { createTask } from '@/lib/api/tasks';
+import { taskKeys } from '@/lib/query-keys';
+import { createTaskSchema, type CreateTaskInput } from '@/lib/validation/task';
+import { createClient } from '@/lib/supabase/client';
 import type { Task } from '@/types/database';
 
 /* ===========================================================================
@@ -40,13 +43,18 @@ import type { Task } from '@/types/database';
  * state into a common parent, no callback threaded down three levels. You told
  * the cache the truth and the UI followed.
  * =========================================================================== */
-
 export function useCreateTask(projectId: string, userId: string) {
+  const supabase = createClient();
+  const queryClient = useQueryClient();
+
   return useMutation<Task, Error, CreateTaskInput>({
-    mutationFn: async () => {
-      throw new Error(
-        `TODO 6: implement useCreateTask (project ${projectId}, user ${userId})`,
-      );
+    mutationFn: (input: CreateTaskInput) =>
+      createTask(supabase, projectId, userId, input),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: taskKeys.list(projectId),
+      });
     },
   });
 }

@@ -42,6 +42,8 @@ export function Board({ projectId }: { projectId: string }) {
     return <BoardSkeleton />;
   }
 
+
+
   // Error state
   if (error) {
     return (

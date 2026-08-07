@@ -198,7 +198,7 @@ rate-limited, and you'd spend the session refreshing a spam folder.
 > **In a real product, leave this ON.** We're turning it off for the workshop
 > only.
 
-### 5b · Leave everything else alone
+### 5b · Leave everything else alone  1SYkkBmDCdnOzHhT
 
 Genuinely. Don't explore the settings yet.
 

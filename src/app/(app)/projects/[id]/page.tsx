@@ -61,7 +61,16 @@ type PageProps = { params: Promise<{ id: string }> };
  *     Test it: break the query on purpose (`.from('projects_typo')`), see the
  *     error UI, click Try again, fix it, watch it recover.
  * =========================================================================== */
+export async function generateMetadata({ params }: PageProps) {
+  const { id } = await params;
 
+  const supabase = await createClient();
+  const project = await fetchProject(supabase, id);
+
+  return {
+    title: project?.name ?? 'Project',
+  };
+}
 export default async function ProjectPage({ params }: PageProps) {
   const { id } = await params;
 

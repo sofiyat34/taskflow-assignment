@@ -1,4 +1,6 @@
-import { z } from 'zod';
+
+ import { z } from 'zod';
+import { TASK_PRIORITIES, TASK_STATUSES } from '@/types/database';
 
 /* ===========================================================================
  * TODO 4 — the task schema
@@ -16,7 +18,7 @@ import { z } from 'zod';
  *   Zod's job      → a friendly red message under the input.   (UX)
  *   The database's → make it impossible.                        (security)
  *
- * With only Zod, anyone can bypass your form with curl. With only the
+ * With only  Zod, anyone can bypass your form with curl. With only the
  * constraint, users get a raw Postgres error in the face.
  * VALIDATE AT EVERY BOUNDARY.
  *
@@ -39,9 +41,25 @@ import { z } from 'zod';
  * schema and every file that is now wrong lights up red. One source of truth.
  * =========================================================================== */
 
+
+/* comments stay here */
+
 export const createTaskSchema = z.object({
-  // TODO 4: replace this placeholder with the four real fields.
-  title: z.string(),
+  title: z
+    .string()
+    .trim()
+    .min(3, 'Title must be at least 3 characters.')
+    .max(120, 'Title cannot exceed 120 characters.'),
+
+  description: z
+    .string()
+    .max(2000, 'Description cannot exceed 2000 characters.')
+    .optional()
+    .or(z.literal('')),
+
+  status: z.enum(TASK_STATUSES),
+
+  priority: z.enum(TASK_PRIORITIES),
 });
 
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;

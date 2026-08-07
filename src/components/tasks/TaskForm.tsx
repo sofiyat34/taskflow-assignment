@@ -1,6 +1,21 @@
 'use client';
 
-import { TodoPanel } from '@/components/ui';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+
+import { useCreateTask } from '@/hooks/useCreateTask';
+import {
+  Button,
+  Field,
+  Input,
+  Select,
+  Textarea,
+} from '@/components/ui';
+import {
+  createTaskSchema,
+  type CreateTaskInput,
+} from '@/lib/validation/task';
+import { TASK_PRIORITIES } from '@/types/database';
 
 /* ===========================================================================
  * TODO 5 — the new-task form, with React Hook Form + Zod
@@ -81,12 +96,42 @@ import { TodoPanel } from '@/components/ui';
  *    slow wi-fi double-clicks and creates the task twice.
  * =========================================================================== */
 
-export function TaskForm({ projectId, userId }: { projectId: string; userId: string }) {
-  return (
-    <TodoPanel id="TODO 5">
-      Build the new-task form here (project <code>{projectId}</code>, user{' '}
-      <code>{userId.slice(0, 8)}…</code>). Start with <code>useForm</code> +{' '}
-      <code>zodResolver</code>.
-    </TodoPanel>
-  );
+export function TaskForm({
+  projectId,
+  userId,
+}: {
+  projectId: string;
+  userId: string;
+}) {
+  const createTask = useCreateTask(projectId, userId);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateTaskInput>({
+    resolver: zodResolver(createTaskSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      status: 'todo',
+      priority: 'medium',
+    },
+  });
+
+  async function onSubmit(values: CreateTaskInput) {
+  try {
+    await createTask.mutateAsync(values);
+    reset();
+  } catch (error) {
+    setError('root', {
+      message:
+        error instanceof Error
+          ? error.message
+          : 'Something went wrong.',
+    });
+  }
+}
 }
